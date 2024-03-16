@@ -1,5 +1,14 @@
 version: '3'
 services:
+  react:
+    build:
+      context: ./react-app/
+      dockerfile: ../.docker/react/Dockerfile
+    volumes:
+      - ./react-app:/srv/app:rw,cached
+    ports:
+      - "3000:3000"
+
   php:
     build: .docker/php
     volumes:
