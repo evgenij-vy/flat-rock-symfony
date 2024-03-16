@@ -2,35 +2,66 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
-use Doctrine\DBAL\Types\Types;
+use App\State\User\UserRegistrationProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource]
+#[Post(
+    uriTemplate: '/users/registration',
+    denormalizationContext: ['groups' => [self::DG_REGISTER]],
+    validationContext: ['groups' => [self::DG_REGISTER]],
+    output: false,
+    processor: UserRegistrationProcessor::class
+
+)]
+#[UniqueEntity(fields: ['email'], message: 'This email already used', groups: [self::DG_REGISTER])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const DG_REGISTER = 'User:registration';
+
     #[ORM\Id]
     #[ORM\GeneratedValue('CUSTOM')]
     #[ORM\Column(type: UuidType::NAME)]
     #[ORM\CustomIdGenerator(UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[Groups([self::DG_REGISTER])]
+    #[Assert\NotBlank(allowNull: false, groups: [self::DG_REGISTER])]
+    #[Assert\Email(groups: [self::DG_REGISTER])]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
+    #[Groups([self::DG_REGISTER])]
+    #[Assert\NotBlank(allowNull: false, groups: [self::DG_REGISTER])]
+    #[Assert\Length(min: 6, groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column]
     private array $roles = [];
 
+    #[Groups([self::DG_REGISTER])]
+    #[Assert\NotBlank(allowNull: false, groups: [self::DG_REGISTER])]
+    #[Assert\Length(max: 255, groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
 
+    #[Groups([self::DG_REGISTER])]
+    #[Assert\Length(max: 255, groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
 
@@ -97,5 +128,14 @@ class User
         $this->lastName = $lastName;
 
         return $this;
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 }
