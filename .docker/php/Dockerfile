@@ -3,7 +3,7 @@ WORKDIR '/app'
 
 # UPD AND INSTALL PACKAGE
 RUN apt-get update \
-    && apt-get install -y apt-utils dialog unzip libicu-dev gnupg2 libzip-dev libpq-dev tzdata\
+    && apt-get install -y apt-utils dialog unzip libicu-dev gnupg2 libzip-dev libpq-dev tzdata openssl\
     && apt-get upgrade -y  \
     # Install YARN
     && curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/yarnkey.gpg \
