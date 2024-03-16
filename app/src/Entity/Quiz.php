@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\QuizRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
@@ -42,9 +44,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => [self::G_ITEM]],
     security: 'is_granted("ADMIN")',
 )]
-#[Delete(
-    security: 'is_granted("ADMIN")'
-)]
 #[ApiFilter(SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_IPARTIAL, properties: ['title', 'description'])]
 #[ApiFilter(BooleanFilter::class, properties: ['active'])]
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
@@ -72,6 +71,14 @@ class Quiz
     #[Groups([self::G_ITEM])]
     #[ORM\Column(name: 'is_active')]
     private bool $active = false;
+
+    #[ORM\OneToMany(targetEntity: QuizQuestion::class, mappedBy: 'quiz', orphanRemoval: true)]
+    private Collection $quizQuestions;
+
+    public function __construct()
+    {
+        $this->quizQuestions = new ArrayCollection();
+    }
 
     public function getId(): ?UuidInterface
     {
@@ -110,6 +117,36 @@ class Quiz
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuizQuestion>
+     */
+    public function getQuizQuestions(): Collection
+    {
+        return $this->quizQuestions;
+    }
+
+    public function addQuizQuestion(QuizQuestion $quizzesQuestion): static
+    {
+        if (!$this->quizQuestions->contains($quizzesQuestion)) {
+            $this->quizQuestions->add($quizzesQuestion);
+            $quizzesQuestion->setQuiz($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuizQuestion(QuizQuestion $quizzesQuestion): static
+    {
+        if ($this->quizQuestions->removeElement($quizzesQuestion)) {
+            // set the owning side to null (unless already changed)
+            if ($quizzesQuestion->getQuiz() === $this) {
+                $quizzesQuestion->setQuiz(null);
+            }
+        }
 
         return $this;
     }
