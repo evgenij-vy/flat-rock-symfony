@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\QuizQuestionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
@@ -46,6 +48,14 @@ class QuizQuestion
 
     #[ORM\Column(name: 'is_active')]
     private bool $active = false;
+
+    #[ORM\OneToMany(targetEntity: QuizQuestionAnswerVariant::class, mappedBy: 'quizQuestion', orphanRemoval: true)]
+    private Collection $quizQuestionAnswerVariants;
+
+    public function __construct()
+    {
+        $this->quizQuestionAnswerVariants = new ArrayCollection();
+    }
 
     public function getId(): ?UuidInterface
     {
@@ -96,6 +106,36 @@ class QuizQuestion
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuizQuestionAnswerVariant>
+     */
+    public function getQuizQuestionAnswerVariants(): Collection
+    {
+        return $this->quizQuestionAnswerVariants;
+    }
+
+    public function addQuizQuestionAnswerVariant(QuizQuestionAnswerVariant $quizQuestionAnswerVariant): static
+    {
+        if (!$this->quizQuestionAnswerVariants->contains($quizQuestionAnswerVariant)) {
+            $this->quizQuestionAnswerVariants->add($quizQuestionAnswerVariant);
+            $quizQuestionAnswerVariant->setQuizQuestion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuizQuestionAnswerVariant(QuizQuestionAnswerVariant $quizQuestionAnswerVariant): static
+    {
+        if ($this->quizQuestionAnswerVariants->removeElement($quizQuestionAnswerVariant)) {
+            // set the owning side to null (unless already changed)
+            if ($quizQuestionAnswerVariant->getQuizQuestion() === $this) {
+                $quizQuestionAnswerVariant->setQuizQuestion(null);
+            }
+        }
 
         return $this;
     }
