@@ -7,6 +7,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
 use App\State\User\UserRegistrationProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
@@ -64,6 +66,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 255, groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
+
+    #[ORM\OneToMany(targetEntity: UserQuiz::class, mappedBy: 'customer', orphanRemoval: true)]
+    private Collection $userQuizzes;
+
+    public function __construct()
+    {
+        $this->userQuizzes = new ArrayCollection();
+    }
 
     public function getId(): ?UuidInterface
     {
@@ -137,5 +147,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->email;
+    }
+
+    /**
+     * @return Collection<int, UserQuiz>
+     */
+    public function getUserQuizzes(): Collection
+    {
+        return $this->userQuizzes;
+    }
+
+    public function addUserQuiz(UserQuiz $userQuiz): static
+    {
+        if (!$this->userQuizzes->contains($userQuiz)) {
+            $this->userQuizzes->add($userQuiz);
+            $userQuiz->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserQuiz(UserQuiz $userQuiz): static
+    {
+        if ($this->userQuizzes->removeElement($userQuiz)) {
+            // set the owning side to null (unless already changed)
+            if ($userQuiz->getCustomer() === $this) {
+                $userQuiz->setCustomer(null);
+            }
+        }
+
+        return $this;
     }
 }
