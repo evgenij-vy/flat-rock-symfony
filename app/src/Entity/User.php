@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
+use App\State\User\MyProfileProvider;
 use App\State\User\UserRegistrationProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -20,6 +22,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
+#[Get(
+    controller: NotFoundAction::class,
+    openapi: false
+)]
+#[Get(
+    uriTemplate: '/my_profile',
+    normalizationContext: ['groups' => [self::NG_ITEM]],
+    provider: MyProfileProvider::class
+)]
 #[Post(
     uriTemplate: '/users/registration',
     denormalizationContext: ['groups' => [self::DG_REGISTER]],
@@ -34,6 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const DG_REGISTER = 'User:registration';
+    public const NG_ITEM = 'User:item';
 
     #[ORM\Id]
     #[ORM\GeneratedValue('CUSTOM')]
@@ -41,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\CustomIdGenerator(UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
-    #[Groups([self::DG_REGISTER])]
+    #[Groups([self::DG_REGISTER, self::NG_ITEM])]
     #[Assert\NotBlank(allowNull: false, groups: [self::DG_REGISTER])]
     #[Assert\Email(groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255, unique: true)]
@@ -56,13 +68,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[Groups([self::DG_REGISTER])]
+    #[Groups([self::DG_REGISTER, self::NG_ITEM])]
     #[Assert\NotBlank(allowNull: false, groups: [self::DG_REGISTER])]
     #[Assert\Length(max: 255, groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
 
-    #[Groups([self::DG_REGISTER])]
+    #[Groups([self::DG_REGISTER, self::NG_ITEM])]
     #[Assert\Length(max: 255, groups: [self::DG_REGISTER])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
@@ -177,5 +189,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    #[Groups(self::NG_ITEM)]
+    public function isAdmin(): bool
+    {
+        return in_array('ADMIN', $this->roles);
     }
 }

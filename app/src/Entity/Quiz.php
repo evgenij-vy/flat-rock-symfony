@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -46,6 +47,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_IPARTIAL, properties: ['title', 'description'])]
 #[ApiFilter(BooleanFilter::class, properties: ['active'])]
+#[UniqueEntity(fields: ['title'])]
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
 class Quiz
 {
