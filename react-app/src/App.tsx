@@ -1,6 +1,13 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {createBrowserRouter} from "react-router-dom";
+
+let router = createBrowserRouter([
+  {
+    path: ""
+  }
+]);
 
 function App() {
   return (
