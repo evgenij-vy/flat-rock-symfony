@@ -28,6 +28,9 @@ class UserAnswer
     #[ORM\JoinColumn(nullable: false)]
     private ?QuizQuestion $quizQuestion = null;
 
+    #[ORM\Column]
+    private ?int $order = null;
+
     public function getId(): ?UuidInterface
     {
         return $this->id;
@@ -65,6 +68,18 @@ class UserAnswer
     public function setQuizQuestion(?QuizQuestion $quizQuestion): self
     {
         $this->quizQuestion = $quizQuestion;
+
+        return $this;
+    }
+
+    public function getOrder(): ?int
+    {
+        return $this->order;
+    }
+
+    public function setOrder(?int $order): self
+    {
+        $this->order = $order;
 
         return $this;
     }
