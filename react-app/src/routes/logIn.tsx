@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import {getApiClient} from "../controller/backEndApi";
-import {redirect} from "react-router-dom";
 
 const LogInForm = () => {
     const [formData, setFormData] = useState(
@@ -24,7 +23,7 @@ const LogInForm = () => {
             '/auth',
             formData
         ).then(function (response) {
-            localStorage.setItem('jwtToken', 'Bearer ' + response.data.token);
+            localStorage.setItem('jwtToken', response.data.token);
             });
     }
 
