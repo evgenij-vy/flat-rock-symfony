@@ -24,6 +24,10 @@ class UserAnswer
     #[ORM\ManyToOne]
     private ?QuizQuestionAnswerVariant $userChoice = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?QuizQuestion $quizQuestion = null;
+
     public function getId(): ?UuidInterface
     {
         return $this->id;
@@ -49,6 +53,18 @@ class UserAnswer
     public function setUserChoice(?QuizQuestionAnswerVariant $userChoice): static
     {
         $this->userChoice = $userChoice;
+
+        return $this;
+    }
+
+    public function getQuizQuestion(): ?QuizQuestion
+    {
+        return $this->quizQuestion;
+    }
+
+    public function setQuizQuestion(?QuizQuestion $quizQuestion): self
+    {
+        $this->quizQuestion = $quizQuestion;
 
         return $this;
     }

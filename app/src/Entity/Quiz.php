@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Filter\IsActiveFilter;
 use App\Repository\QuizRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,25 +26,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     normalizationContext: ['groups' => [self::G_ITEM]],
+    security: 'is_granted("ADMIN")'
 )]
-#[Get(
-    security: 'object.isActive() or is_granted("ADMIN")'
-)]
-#[GetCollection(
-    security: 'is_granted("ADMIN")',
-)]
+#[Get]
+#[GetCollection]
 #[GetCollection(
     uriTemplate: '/quizzes/for_users',
-    security: 'is_granted("USER")'
+    security: 'true',
+    filters: [IsActiveFilter::class]
 )]
 #[Post(
     denormalizationContext: ['groups' => [self::G_ITEM]],
-    security: 'is_granted("ADMIN")',
     validationContext: ['groups' => [self::G_ITEM]]
 )]
 #[Patch(
-    denormalizationContext: ['groups' => [self::G_ITEM]],
-    security: 'is_granted("ADMIN")',
+    denormalizationContext: ['groups' => [self::G_ITEM]]
 )]
 #[ApiFilter(SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_IPARTIAL, properties: ['title', 'description'])]
 #[ApiFilter(BooleanFilter::class, properties: ['active'])]

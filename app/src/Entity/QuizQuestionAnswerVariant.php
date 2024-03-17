@@ -2,12 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Action\NotFoundAction;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Filter\IsActiveFilter;
 use App\Repository\QuizQuestionAnswerVariantRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
 use Ramsey\Uuid\UuidInterface;
 
+#[ApiResource]
+#[Get(
+    controller: NotFoundAction::class,
+    openapi: false
+)]
+#[GetCollection(
+    uriVariables: '/quiz_questions/{quizQuestion}//quiz_question_answer_variants',
+    filters: [IsActiveFilter::class]
+)]
+#[Post]
+#[Patch]
 #[ORM\Entity(repositoryClass: QuizQuestionAnswerVariantRepository::class)]
 class QuizQuestionAnswerVariant
 {

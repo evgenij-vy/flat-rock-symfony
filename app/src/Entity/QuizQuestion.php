@@ -4,11 +4,11 @@ namespace App\Entity;
 
 use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Filter\IsActiveFilter;
 use App\Repository\QuizQuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,7 +23,8 @@ use Ramsey\Uuid\UuidInterface;
     openapi: false
 )]
 #[GetCollection(
-    uriTemplate: '/quizzes/{quiz}/questions'
+    uriTemplate: '/quizzes/{quiz}/questions',
+    filters: [IsActiveFilter::class]
 )]
 #[Post]
 #[Patch]
@@ -51,6 +52,10 @@ class QuizQuestion
 
     #[ORM\OneToMany(targetEntity: QuizQuestionAnswerVariant::class, mappedBy: 'quizQuestion', orphanRemoval: true)]
     private Collection $quizQuestionAnswerVariants;
+
+    #[ORM\OneToOne(targetEntity: QuizQuestionAnswerVariant::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?QuizQuestionAnswerVariant $correctAnswer = null;
 
     public function __construct()
     {
@@ -136,6 +141,18 @@ class QuizQuestion
                 $quizQuestionAnswerVariant->setQuizQuestion(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCorrectAnswer(): ?QuizQuestionAnswerVariant
+    {
+        return $this->correctAnswer;
+    }
+
+    public function setCorrectAnswer(?QuizQuestionAnswerVariant $correctAnswer): self
+    {
+        $this->correctAnswer = $correctAnswer;
 
         return $this;
     }
