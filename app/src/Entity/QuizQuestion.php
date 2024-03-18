@@ -6,6 +6,7 @@ use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Filter\IsActiveFilter;
@@ -16,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource]
 #[Get(
@@ -24,29 +26,42 @@ use Ramsey\Uuid\UuidInterface;
 )]
 #[GetCollection(
     uriTemplate: '/quizzes/{quiz}/questions',
-    filters: [IsActiveFilter::class]
+    uriVariables: ['quiz' => new Link(toProperty: 'quiz', fromClass: QuizQuestion::class)],
+    paginationEnabled: false,
+    order: ['active' => 'DESC'],
+    security: 'is_granted("ROLE_ADMIN")'
 )]
-#[Post]
+#[Post(
+    denormalizationContext: ['groups' => [self::DG_ITEM]],
+    security: 'is_granted("ROLE_ADMIN")',
+    output: false
+)]
 #[Patch]
 #[ORM\Entity(repositoryClass: QuizQuestionRepository::class)]
 class QuizQuestion
 {
+    public const DG_ITEM = 'QuizQuestion:create';
+
     #[ORM\Id]
     #[ORM\GeneratedValue('CUSTOM')]
     #[ORM\Column(type: UuidType::NAME)]
     #[ORM\CustomIdGenerator(UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
+    #[Groups([self::DG_ITEM])]
     #[ORM\ManyToOne(inversedBy: 'quizzesQuestions')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Quiz $quiz = null;
 
+    #[Groups([self::DG_ITEM])]
     #[ORM\Column(length: 1023)]
     private ?string $question = null;
 
+    #[Groups([self::DG_ITEM])]
     #[ORM\Column(length: 255)]
     private ?string $answerType = null;
 
+    #[Groups([self::DG_ITEM])]
     #[ORM\Column(name: 'is_active')]
     private bool $active = false;
 
@@ -54,7 +69,7 @@ class QuizQuestion
     private Collection $quizQuestionAnswerVariants;
 
     #[ORM\OneToOne(targetEntity: QuizQuestionAnswerVariant::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     private ?QuizQuestionAnswerVariant $correctAnswer = null;
 
     public function __construct()

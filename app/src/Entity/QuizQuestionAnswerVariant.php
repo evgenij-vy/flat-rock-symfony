@@ -21,7 +21,7 @@ use Ramsey\Uuid\UuidInterface;
     openapi: false
 )]
 #[GetCollection(
-    uriVariables: '/quiz_questions/{quizQuestion}//quiz_question_answer_variants',
+    uriTemplate: '/quiz_questions/{quizQuestion}/quiz_question_answer_variants',
     filters: [IsActiveFilter::class]
 )]
 #[Post]

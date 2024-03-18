@@ -70,8 +70,8 @@ const QuizzesForm = () => {
                 </thead>
                 <tbody>
                     {quizzes.map((quiz) => (
-                        <tr onClick={openEditForm} accessKey={quiz['@id']}>
-                            <td>{quiz['title']}</td>
+                        <tr>
+                            <td><a href={"/admin/quiz/" + quiz['id']}>{quiz['title']}</a></td>
                             <td>{quiz['active'] ? 'yes' : 'no'}</td>
                         </tr>
                     ))}

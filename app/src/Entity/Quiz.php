@@ -29,7 +29,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     security: 'is_granted("ROLE_ADMIN")'
 )]
 #[Get]
-#[GetCollection]
+#[GetCollection(
+    order: ['active' => 'DESC', 'title' => 'ASC']
+)]
 #[GetCollection(
     uriTemplate: '/quizzes/for_users',
     security: 'true',
@@ -50,6 +52,7 @@ class Quiz
 {
     public const G_ITEM = 'Quiz:item';
 
+    #[Groups([self::G_ITEM])]
     #[ORM\Id]
     #[ORM\GeneratedValue('CUSTOM')]
     #[ORM\Column(type: UuidType::NAME)]
