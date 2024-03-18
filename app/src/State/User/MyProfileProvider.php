@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 
 class MyProfileProvider implements ProviderInterface
 {
@@ -17,8 +18,8 @@ class MyProfileProvider implements ProviderInterface
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?User
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): User
     {
-        return $this->security->getUser();
+        return $this->security->getUser() ?? throw new InsufficientAuthenticationException();
     }
 }

@@ -31,7 +31,7 @@ class UserRegistrationProcessor implements ProcessorInterface
         $this->persistProcessor->process(
             $data
                 ->setPassword($this->passwordHasher->hashPassword($data, $data->getPassword()))
-                ->setRoles($this->userRepository->count([]) === 0 ? ['ADMIN'] : ['USER']),
+                ->setRoles($this->userRepository->count([]) === 0 ? ['ROLE_ADMIN'] : ['ROLE_USER']),
             $operation,
             $uriVariables,
             $context

@@ -1,5 +1,7 @@
 import {useEffect, useState} from "react";
 import {getApiClient} from "../controller/backEndApi";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 const AccountForm = () => {
     const [userData, setUserData] = useState({
@@ -11,9 +13,9 @@ const AccountForm = () => {
     useEffect(() => {
         getApiClient()
             .get('/my_profile')
-            .then(function (response) {
+            .then((response) => {
                 setUserData(response.data);
-            });
+            })
     }, []);
 
     return (

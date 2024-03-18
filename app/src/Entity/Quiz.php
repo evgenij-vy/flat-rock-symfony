@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     normalizationContext: ['groups' => [self::G_ITEM]],
-    security: 'is_granted("ADMIN")'
+    security: 'is_granted("ROLE_ADMIN")'
 )]
 #[Get]
 #[GetCollection]

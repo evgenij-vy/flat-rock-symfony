@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {getApiClient} from "../controller/backEndApi";
+import {useNavigate} from "react-router-dom";
 
 const LogInForm = () => {
     const [formData, setFormData] = useState(
@@ -25,9 +26,11 @@ const LogInForm = () => {
             formData
         ).then(function (response) {
             localStorage.setItem('jwtToken', response.data.token);
-
+            navigate('/');
             });
     }
+
+    const navigate = useNavigate();
 
     return (
         <form onSubmit={handleSubmit}>
