@@ -1,15 +1,15 @@
 import axios, {AxiosInstance} from "axios";
-import {redirect} from "react-router-dom";
 
-export function getApiClient(withToken = true): AxiosInstance {
-    const token = localStorage.getItem('jwtToken');
+export function getApiClient(withToken: null|string = null): AxiosInstance {
+    const token = withToken ?? localStorage.getItem('jwtToken');
     const apiClient =  axios.create({
         baseURL: 'http://localhost:8080',
         timeout: 30000,
     });
 
     apiClient.defaults.headers.common['Content-Type'] = 'application/ld+json';
-    if (withToken && token) {
+
+    if (token) {
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 

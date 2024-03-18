@@ -194,6 +194,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(self::NG_ITEM)]
     public function isAdmin(): bool
     {
-        return in_array('ADMIN', $this->roles);
+        return in_array('ROLE_ADMIN', $this->roles);
     }
 }

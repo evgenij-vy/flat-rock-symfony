@@ -10,6 +10,8 @@ const LogInForm = () => {
         }
     );
 
+    const navigate = useNavigate();
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
             ...formData,
@@ -20,17 +22,18 @@ const LogInForm = () => {
     const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        getApiClient(false).
-        post(
-            '/auth',
-            formData
-        ).then(function (response) {
-            localStorage.setItem('jwtToken', response.data.token);
+        getApiClient('')
+            .post('/auth', formData)
+            .then(function (response) {
+                localStorage.setItem('jwtToken', response.data.token);
+
+            getApiClient(response.data.token)
+                .get('/my_profile')
+                .then((response) => {localStorage.setItem('isAdmin', response.data.admin)})
+
             navigate('/');
             });
     }
-
-    const navigate = useNavigate();
 
     return (
         <form onSubmit={handleSubmit}>
