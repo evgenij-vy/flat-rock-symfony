@@ -19,11 +19,13 @@ const LogInForm = () => {
     const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        getApiClient().post(
+        getApiClient(false).
+        post(
             '/auth',
             formData
         ).then(function (response) {
             localStorage.setItem('jwtToken', response.data.token);
+
             });
     }
 

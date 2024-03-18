@@ -1,26 +1,27 @@
+import {useEffect, useState} from "react";
 import {getApiClient} from "../controller/backEndApi";
 
-async function getData(){
-    let data;
-
-    await getApiClient().get(
-        '/my_profile'
-    ).then(function (response) {
-        return response.data;
-        })
-        .then(function (responseData) {
-            data = responseData;
+const AccountForm = () => {
+    const [userData, setUserData] = useState({
+        email: '',
+        firstName: '',
+        lastName: ''
     });
 
-    return data;
-}
-
-const AccountForm = () => {
-    const data = getData();
+    useEffect(() => {
+        getApiClient()
+            .get('/my_profile')
+            .then(function (response) {
+                setUserData(response.data);
+            });
+    }, []);
 
     return (
         <>
             <div>
+                <p>email: {userData.email}</p>
+                <p>first name: {userData.firstName}</p>
+                <p>last name: {userData.lastName}</p>
             </div>
         </>
     );
