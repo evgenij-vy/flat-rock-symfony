@@ -55,6 +55,7 @@ crud:
 .PHONY: setup
 setup: ##setup application
 setup:
+	cd react-app; yarn install;
 	docker-compose build --no-cache
 	docker-compose up -d
 	docker-compose exec php composer install
