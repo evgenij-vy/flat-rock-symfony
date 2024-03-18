@@ -57,7 +57,8 @@ setup: ##setup application
 setup:
 	docker-compose build --no-cache
 	docker-compose up -d
-	docker-compose exec php bin/console lexik:jwt:generate-keypair
+	docker-compose exec php composer install
+	docker-compose exec php bin/console doctrine:migrations:migrate --no-interaction
+	docker-compose exec php bin/console lexik:jwt:generate-keypair --overwrite
 	docker-compose exec php setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
 	docker-compose exec php setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
-	docker-compose exec php bin/console doctrine:migrations:migrate
