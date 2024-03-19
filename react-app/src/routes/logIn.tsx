@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import {getApiClient} from "../controller/backEndApi";
-import {useNavigate} from "react-router-dom";
 
 const LogInForm = () => {
     const [formData, setFormData] = useState(
@@ -9,8 +8,6 @@ const LogInForm = () => {
             password: ''
         }
     );
-
-    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -29,9 +26,10 @@ const LogInForm = () => {
 
             getApiClient(response.data.token)
                 .get('/my_profile')
-                .then((response) => {localStorage.setItem('isAdmin', response.data.admin)})
-
-            navigate('/');
+                .then((response) => {
+                    localStorage.setItem('isAdmin', response.data.admin);
+                    window.location.href='/';
+                })
             });
     }
 

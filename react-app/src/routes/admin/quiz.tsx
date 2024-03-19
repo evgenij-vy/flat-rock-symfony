@@ -44,10 +44,12 @@ const QuizForm = () => {
                 question: questionData.question,
                 answerType: questionData.answerType,
                 active: questionData.active
-            })
-        setHiddenCreateQuestionBlock(true);
-        getQuizQuestions(quizId).then((questions) => setQuizData({...quizObject, questions: questions}));
-        setQuestionData(getQuizQuestion);
+            }).then(() => {
+                setHiddenCreateQuestionBlock(true);
+                getQuizQuestions(quizId).then((questions) => setQuizData({...quizObject, questions: questions}));
+                setQuestionData(getQuizQuestion);
+            }
+        )
     }
 
     return (
@@ -75,8 +77,8 @@ const QuizForm = () => {
                     value={questionData.answerType}
                     onChange={(event) => setQuestionData({...questionData, answerType: event.target.value})}
                 >
-                <option value='Binary'>Binary</option>
-                <option value='Multiple'>Multiple choice</option>
+                <option value='binary'>Binary</option>
+                <option value='multiple'>Multiple choice</option>
                 </select>
                 Active: <input
                     type='checkbox'

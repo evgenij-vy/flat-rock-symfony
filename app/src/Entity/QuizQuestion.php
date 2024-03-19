@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Doctrine\Enum\AnswerTypeEnumType;
+use App\Enum\AnswerType;
 use App\Filter\IsActiveFilter;
 use App\Repository\QuizQuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,6 +20,7 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Doctrine\UuidType;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
 #[Get(
@@ -34,6 +37,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Post(
     denormalizationContext: ['groups' => [self::DG_ITEM]],
     security: 'is_granted("ROLE_ADMIN")',
+    validationContext: ['groups' => [self::DG_ITEM]],
     output: false
 )]
 #[Patch]
@@ -49,19 +53,23 @@ class QuizQuestion
     private ?UuidInterface $id = null;
 
     #[Groups([self::DG_ITEM])]
+    #[Assert\NotNull(groups: [self::DG_ITEM])]
     #[ORM\ManyToOne(inversedBy: 'quizzesQuestions')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Quiz $quiz = null;
 
     #[Groups([self::DG_ITEM])]
+    #[Assert\NotBlank(allowNull: false, groups: [self::DG_ITEM])]
+    #[Assert\Length(max: 1023, groups: [self::DG_ITEM])]
     #[ORM\Column(length: 1023)]
     private ?string $question = null;
 
     #[Groups([self::DG_ITEM])]
-    #[ORM\Column(length: 255)]
-    private ?string $answerType = null;
+    #[Assert\NotBlank(allowNull: false, groups: [self::DG_ITEM])]
+    #[Assert\Choice(choices: AnswerType::CASES, groups: [self::DG_ITEM])]
+    #[ORM\Column(type: AnswerTypeEnumType::NAME, length: 255)]
+    private ?AnswerType $answerType = null;
 
-    #[Groups([self::DG_ITEM])]
     #[ORM\Column(name: 'is_active')]
     private bool $active = false;
 
@@ -106,12 +114,12 @@ class QuizQuestion
         return $this;
     }
 
-    public function getAnswerType(): ?string
+    public function getAnswerType(): ?AnswerType
     {
         return $this->answerType;
     }
 
-    public function setAnswerType(string $answerType): static
+    public function setAnswerType(AnswerType $answerType): static
     {
         $this->answerType = $answerType;
 

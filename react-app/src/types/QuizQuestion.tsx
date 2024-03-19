@@ -12,7 +12,7 @@ export function getQuizQuestion() {
     return {
         id: '',
         question: '',
-        answerType: '',
+        answerType: 'binary',
         active: false,
         quiz: '',
         correctAnswer: '',

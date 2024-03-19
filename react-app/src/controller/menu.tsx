@@ -1,8 +1,6 @@
-import {useNavigate} from "react-router-dom";
-
 const Menu = () => {
     let hasToken = localStorage.getItem('jwtToken') != null;
-    let isAdmin = localStorage.getItem('isAdmin') != null;
+    let isAdmin = localStorage.getItem('isAdmin') == 'true';
 
     return (
         <>
